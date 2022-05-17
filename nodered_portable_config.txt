@@ -1,0 +1,1 @@
+{"port": 1880 , "adminPath": "/admin", "autostart": true}

@@ -1,5 +1,5 @@
 {
-    "name": "xerius",
+    "name": "studio",
     "version": "0.0.1",
     "description": "An open source low-code platform based on ElectronJS, Framework7, Node-Red and uibuilder.",
     "main": "main.js",
@@ -8,30 +8,39 @@
         "test": "echo \" Warning: no test specified \"",
         "watch": "nodemon --exec \"npm run start\" --ext js,css,json --ignore build/",
         "clean": "rm -rf ./build ../electron-bin && mkdir -p ./build ../electron-bin",
-        "pack": "npm run clean && electron-packager . Xerius --icon=nodered.icns --all --out=build --overwrite",
-        "pack:osx": "electron-packager . Xerius --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
-        "pack:linux32": "electron-packager . Xerius --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp afterinst.sh build/Xerius-linux-ia32/",
-        "pack:linux64": "electron-packager . Xerius --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite && cp afterinst.sh build/Xerius-linux-x64",
-        "pack:win32": "electron-packager . Xerius --icon=nodered.icns --platform=win32 --arch=ia32 --out=build --asar --overwrite --win32metadata.CompanyName='CV Infinity Karya Bersama' --win32metadata.ProductName='Xerius'",
-        "pack:win64": "electron-packager . Xerius --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar --overwrite --win32metadata.CompanyName='CV Infinity Karya Bersama' --win32metadata.ProductName='Xerius'",
-        "pack:armv7l": "electron-packager . Xerius --icon=nodered.icns --platform=linux --arch=armv7l --out=build --overwrite && cp afterinst.sh build/Xerius-linux-armv7l",
+        "pack": "npm run clean && electron-packager . Studio --icon=nodered.icns --all --out=build --overwrite",
+        "pack:osx": "electron-packager . Studio --icon=nodered.icns --platform=darwin --arch=x64 --out=build --overwrite",
+        "pack:linux32": "electron-packager . Studio --icon=nodered.icns --platform=linux --arch=ia32 --out=build --overwrite && cp afterinst.sh build/Studio-linux-ia32/",
+        "pack:linux64": "electron-packager . Studio --icon=nodered.icns --platform=linux --arch=x64 --out=build --overwrite && cp afterinst.sh build/Studio-linux-x64",
+        "pack:win32": "electron-packager . Studio --icon=nodered.icns --platform=win32 --arch=ia32 --out=build --asar --overwrite --win32metadata.CompanyName='CV Infinity Karya Bersama' --win32metadata.ProductName='Studio'",
+        "pack:win64": "electron-packager . Studio --icon=nodered.icns --platform=win32 --arch=x64  --out=build --asar --overwrite --win32metadata.CompanyName='CV Infinity Karya Bersama' --win32metadata.ProductName='Studio'",
+        "pack:armv7l": "electron-packager . Studio --icon=nodered.icns --platform=linux --arch=armv7l --out=build --overwrite && cp afterinst.sh build/Studio-linux-armv7l",
         "build": "npm run clean && npm run build:osx && npm run build:linux64 && npm run build:linux32",
-        "build:osx": "npm run pack:osx && appdmg appdmg.json ../electron-bin/Xerius-Electron_$npm_package_version.dmg",
-        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a i386   -p ../electron-bin -C build/Xerius-linux-ia32 --prefix=/opt/node-red --after-install=afterinst.sh ./",
-        "build:linux64": "npm run pack:linux64 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a x86_64 -p ../electron-bin -C build/Xerius-linux-x64  --prefix=/opt/node-red --after-install=afterinst.sh ./",
+        "build:osx": "npm run pack:osx && appdmg appdmg.json ../electron-bin/Studio_$npm_package_version.dmg",
+        "build:linux32": "npm run pack:linux32 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a i386   -p ../electron-bin -C build/Studio-linux-ia32 --prefix=/opt/node-red --after-install=afterinst.sh ./",
+        "build:linux64": "npm run pack:linux64 && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a x86_64 -p ../electron-bin -C build/Studio-linux-x64  --prefix=/opt/node-red --after-install=afterinst.sh ./",
         "build:win32": "npm run pack:win32 && node makewin32.js",
         "build:win64": "npm run pack:win64 && node makewin64.js",
-        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a armv7l -p ../electron-bin -C build/Xerius-linux-armv7l --prefix=/opt/node-red --after-install=afterinst.sh ./"
+        "build:armv7l": "npm run pack:armv7l && fpm -s dir -t deb -f -n node-red-electron -v $npm_package_version -m info@etter.cloud -a armv7l -p ../electron-bin -C build/Studio-linux-armv7l --prefix=/opt/node-red --after-install=afterinst.sh ./"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/imboost/xerius.git"
+        "url": "git+https://github.com/imboost/studio.git"
     },
     "dependencies": {
         "express": "^4.14.0",
         "node-red": "^2.2.2",
         "node-red-contrib-fs-ops-coco": "^1.6.2",
-        "node-red-contrib-uibuilder": "~5.0.2"
+        "node-red-contrib-uibuilder": "~5.0.2",
+        "@prescient-devices/node-red-contrib-admin-api-url": "~1.0.3",
+        "node-red-contrib-cheerio": "~1.1.0",
+        "node-red-contrib-cheerio-function": "~1.0.0-rc.3",
+        "node-red-contrib-html-entities": "~0.1.0",
+        "node-red-contrib-os": "~0.2.1",
+        "node-red-contrib-scrape-it": "~1.0.6",
+        "node-red-contrib-string": "~1.0.0",
+        "node-red-contrib-tcp-ping": "~0.0.3",
+        "node-red-html-to-text": "~0.0.1"
     },
     "keywords": [
         "low-code",
@@ -56,9 +65,9 @@
     ],
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/imboost/xerius/issues"
+        "url": "https://github.com/imboost/studio/issues"
     },
-    "homepage": "https://github.com/imboost/xerius#readme",
+    "homepage": "https://github.com/imboost/studio#readme",
     "devDependencies": {
         "electron": "^18.2.3",
         "electron-rebuild": "^3.2.7",

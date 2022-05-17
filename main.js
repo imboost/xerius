@@ -1,16 +1,10 @@
-
 'use strict';
 
-// Some settings you can edit easily
-// Flows file name
 const flowfile = 'flows.json';
-// Start on the dashboard page
-const url = "/pro";
-// url for the editor page
+const url = "/pro/#!/designer/";
 const urledit = "/admin";
-// tcp port to use
-//const listenPort = "18880"; // fix it just because
-const listenPort = parseInt(Math.random() * 16383 + 49152) // or random ephemeral port
+const listenPort = "1880"; // fix it just because
+// const listenPort = parseInt(Math.random() * 16383 + 49152) // or random ephemeral port
 
 const os = require('os');
 const electron = require('electron');
@@ -19,7 +13,9 @@ const BrowserWindow = electron.BrowserWindow;
 const { Menu, MenuItem } = electron;
 
 // this should be placed at top of main.js to handle squirrel setup events quickly
-// if (handleSquirrelEvent()) { return; }
+if (handleSquirrelEvent()) {
+    return;
+}
 
 var http = require('http');
 var express = require("express");
@@ -29,7 +25,7 @@ var RED = require("node-red");
 var red_app = express();
 
 // Add a simple route for static content served from 'public'
-//red_app.use(express.static(__dirname +"/public"));
+red_app.use(express.static(__dirname + "/public"));
 
 // Create a server
 var server = http.createServer(red_app);
@@ -37,27 +33,47 @@ var server = http.createServer(red_app);
 var userdir;
 if (process.argv[1] && (process.argv[1] === "main.js")) {
     userdir = __dirname;
-}
-else { // We set the user directory to be in the users home directory...
+} else {
+    // We set the user directory to be in the users home directory
     const fs = require('fs');
     userdir = os.homedir() + '/.node-red';
+
     if (!fs.existsSync(userdir)) {
         fs.mkdirSync(userdir);
     }
+
     if (!fs.existsSync(userdir + "/" + flowfile)) {
         fs.writeFileSync(userdir + "/" + flowfile, fs.readFileSync(__dirname + "/" + flowfile));
     }
 }
-console.log("Setting UserDir to ", userdir);
+// console.log("Setting UserDir to ", userdir);
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
     verbose: true,
     httpAdminRoot: "/admin",
     httpNodeRoot: "/",
+    adminAuth: {
+        type: "credentials",
+        users: [
+            {
+                username: "admin",
+                password: "$2b$08$HY1zXKFgJ/uJLRW9uimawO8Ja.xnySjKlsCRDaRvlPwA2Hs7Z9MaW",
+                permissions: "*"
+            }
+        ]
+    },
     userDir: userdir,
     flowFile: flowfile,
-    functionGlobalContext: {}    // enables global context
+    httpStatic: "public",
+    contextStorage: {
+        default: {
+            module: "localfilesystem",
+            config: {
+                dir: "context"
+            }
+        }
+    }
 };
 
 // Initialise the runtime with a server and settings
@@ -71,45 +87,34 @@ red_app.use(settings.httpNodeRoot, RED.httpNode);
 
 // Create the Application's main menu
 var template = [{
-    label: "Application",
-    submenu: [
-        { role: 'about' },
-        { type: "separator" },
-        { role: 'quit' }
-    ]
-}, {
-    label: 'Node-RED',
+    label: 'Menu',
     submenu: [
         {
-            label: 'Dashboard',
-            accelerator: "Shift+CmdOrCtrl+D",
-            click() { mainWindow.loadURL("http://localhost:" + listenPort + url); }
+            label: 'UI Designer',
+            click() {
+                mainWindow.loadURL("http://127.0.0.1:" + listenPort + url);
+            }
         },
         {
-            label: 'Editor',
-            accelerator: "Shift+CmdOrCtrl+E",
-            click() { mainWindow.loadURL("http://localhost:" + listenPort + urledit); }
+            label: 'Node-RED',
+            click() {
+                mainWindow.loadURL("http://127.0.0.1:" + listenPort + urledit);
+            }
+        },
+        {
+            label: 'ETTER Cloud',
+            click() {
+                mainWindow.loadURL("https://console.etter.cloud");
+            }
         },
         { type: 'separator' },
         {
-            label: 'Documentation',
-            click() { require('electron').shell.openExternal('http://nodered.org/docs') }
-        },
-        {
-            label: 'Flows and Nodes',
-            click() { require('electron').shell.openExternal('http://flows.nodered.org') }
-        },
-        {
-            label: 'Google group',
-            click() { require('electron').shell.openExternal('https://groups.google.com/forum/#!forum/node-red') }
+            role: 'quit'
         }
     ]
 }, {
     label: "Edit",
     submenu: [
-        { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-        { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-        { type: "separator" },
         { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
         { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
         { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
@@ -121,12 +126,16 @@ var template = [{
         {
             label: 'Reload',
             accelerator: 'CmdOrCtrl+R',
-            click(item, focusedWindow) { if (focusedWindow) focusedWindow.reload(); }
+            click(item, focusedWindow) {
+                if (focusedWindow) focusedWindow.reload();
+            }
         },
         {
-            label: 'Toggle Developer Tools',
+            label: 'Developer Tools',
             accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-            click(item, focusedWindow) { if (focusedWindow) focusedWindow.webContents.toggleDevTools(); }
+            click(item, focusedWindow) {
+                if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+            }
         },
         { type: 'separator' },
         { role: 'resetzoom' },
@@ -136,8 +145,7 @@ var template = [{
         { role: 'togglefullscreen' },
         { role: 'minimize' }
     ]
-}
-];
+}];
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -146,13 +154,11 @@ let mainWindow;
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        autoHideMenuBar: true,
         webPreferences: {
             nodeIntegration: false
         },
-        title: "Node-RED",
+        title: "ETTER Studio",
         fullscreenable: true,
-        //titleBarStyle: "hidden",
         width: 1024,
         height: 768,
         icon: __dirname + "/nodered.png"
@@ -216,7 +222,7 @@ app.on('activate', function () {
 
 // Start the Node-RED runtime, then load the inital page
 RED.start().then(function () {
-    server.listen(listenPort, "127.0.0.1", function () {
+    server.listen(listenPort, function () {
         mainWindow.loadURL("http://127.0.0.1:" + listenPort + url);
     });
 });
